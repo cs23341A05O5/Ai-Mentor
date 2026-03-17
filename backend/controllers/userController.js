@@ -419,8 +419,8 @@ export {
   purchaseCourse,
   updateCourseProgress,
   getUserSettings,
-  getWatchedVideos, // stub
-  updateUserSettings, // stub
-  updateUserProfile, // stub
+  getWatchedVideos, 
+  updateUserSettings, 
+  updateUserProfile, 
   removePurchasedCourse,
 };

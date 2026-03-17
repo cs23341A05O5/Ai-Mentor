@@ -93,23 +93,16 @@ export default function Settings() {
         },
       });
 
-      console.log("✅ Backend response:", response.data);
-
-      // 🔥 FIX 1: Update context FIRST with fresh data
+      // Update the user context with the fresh data from the backend
+      // This ensures avatar_url and other fields are immediately updated globally
       updateUser(response.data);
 
-      // 🔥 FIX 2: Wait for state to update, THEN fetch (or skip fetch entirely)
-      setTimeout(async () => {
-        await fetchUserProfile(); // This will now return avatar_url!
-        console.log("🔄 Refetched user:", JSON.parse(localStorage.getItem("user")));
-      }, 500);
-
       setAvatarFile(null);
-      toast.success("Profile updated successfully!");
+      toast.success(t("settings.profile.update_success") || "Profile updated successfully!");
       setProfilePopup(true);
     } catch (error) {
       console.error("❌ Error updating profile:", error.response?.data || error);
-      toast.error("Failed to update profile.");
+      toast.error(t("settings.profile.update_error") || "Failed to update profile.");
     } finally {
       setLoading(false);
     }
@@ -212,34 +205,38 @@ export default function Settings() {
                 <div className="bg-card rounded-[24px] shadow-[0_4px_6px_0_rgba(0,0,0,0.10),0_10px_15px_0_rgba(0,0,0,0.10)] p-8">
                   <div className="flex gap-8 mb-8">
                     {/* Avatar Section */}
-                    <div className="flex flex-col items-center">
-                      <div className="relative mb-6">
-                        <img
-                          src={
-                            avatarFile
-                              ? URL.createObjectURL(avatarFile)
-                              : user?.avatar_url
-                                ? user.avatar_url
-                                : `https://api.dicebear.com/8.x/initials/svg?seed=${formData.firstName}%20${formData.lastName}`
-                          }
-                          alt="Profile"
-                          className="w-32 h-32 rounded-full border-4 border-[rgba(255,135,89,0.65)] shadow-[0_4px_6px_0_rgba(0,0,0,0.10),0_10px_15px_0_rgba(0,0,0,0.10)]"
-                        />
+                    <div className="flex flex-col items-center md:w-1/3">
+                      <div className="relative mb-6 group">
+                        <div className="w-32 h-32 rounded-full border-4 border-[rgba(255,135,89,0.65)] shadow-lg overflow-hidden bg-canvas">
+                          <img
+                            src={
+                              avatarFile
+                                ? URL.createObjectURL(avatarFile)
+                                : user?.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(formData.firstName + " " + formData.lastName)}`
+                            }
+                            alt="Profile"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        </div>
 
-                        <label className="absolute bottom-2 right-2 w-10 h-10 bg-[#475569] rounded-full flex items-center justify-center cursor-pointer shadow-[0_4px_6px_0_rgba(0,0,0,0.10),0_10px_15px_0_rgba(0,0,0,0.10)]">
-                          <Camera className="w-[14px] h-[14px] text-white" />
+                        <label className="absolute bottom-1 right-1 w-10 h-10 bg-teal-500 hover:bg-teal-600 text-white rounded-full flex items-center justify-center cursor-pointer shadow-xl transition-all duration-300 hover:scale-110 border-2 border-card">
+                          <Camera className="w-5 h-5" />
                           <input
                             type="file"
                             accept="image/*"
                             hidden
-                            onChange={(e) => setAvatarFile(e.target.files[0])}
+                            onChange={(e) => {
+                              if (e.target.files?.[0]) {
+                                setAvatarFile(e.target.files[0]);
+                              }
+                            }}
                           />
                         </label>
                       </div>
-                      <h2 className="text-[20px] font-semibold text-main font-[Inter] mb-1">
+                      <h2 className="text-xl font-bold text-main font-[Inter] mb-1 text-center">
                         {formData.firstName} {formData.lastName}
                       </h2>
-                      <p className="text-[16px] text-muted font-[Inter]">
+                      <p className="text-sm text-muted font-medium font-[Inter] text-center opacity-70 uppercase tracking-widest">
                         {t("common.premium_member")}
                       </p>
                     </div>

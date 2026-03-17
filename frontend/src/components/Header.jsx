@@ -259,28 +259,30 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="flex items-center space-x-3 p-1 pr-3 rounded-2xl hover:bg-canvas-alt transition-all border border-transparent hover:border-border group"
+              className="flex items-center space-x-2 sm:space-x-3 p-1 sm:pr-3 rounded-2xl hover:bg-canvas-alt transition-all border border-transparent hover:border-border group"
+              aria-expanded={dropdownOpen}
+              aria-haspopup="true"
             >
               <div className="relative">
                 <img
-                  src={`https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(displayName)}`}
-                  className="w-9 h-9 rounded-xl shadow-md border border-border/50 group-hover:border-teal-500 transition-all"
-                  alt="Avatar"
+                  src={user?.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(displayName)}`}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md border border-border/50 group-hover:border-teal-500 transition-all object-cover"
+                  alt=""
                 />
                 <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-card rounded-full" />
               </div>
-              <span className="text-sm font-bold text-main hidden lg:block">{displayName}</span>
+              <span className="text-sm font-bold text-main hidden lg:block truncate max-w-[120px]">{displayName}</span>
             </button>
 
             {/* Impressive Floating Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-4 w-72 bg-card/95 backdrop-blur-2xl border border-border/50 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[110] overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
-                <div className="p-6 bg-gradient-to-br from-teal-500/10 via-blue-500/5 to-transparent border-b border-border/50">
-                  <div className="flex items-center space-x-4 mb-4">
+              <div className="absolute right-0 mt-4 w-64 sm:w-72 bg-card/95 backdrop-blur-2xl border border-border/50 rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[110] overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
+                <div className="p-4 sm:p-6 bg-gradient-to-br from-teal-500/10 via-blue-500/5 to-transparent border-b border-border/50">
+                  <div className="flex items-center space-x-3 sm:space-x-4 mb-4">
                     <img
-                      src={`https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(displayName)}`}
-                      className="w-14 h-14 rounded-2xl shadow-xl border-2 border-white dark:border-slate-800"
-                      alt="User"
+                      src={user?.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(displayName)}`}
+                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl shadow-xl border-2 border-white dark:border-slate-800 object-cover"
+                      alt=""
                     />
                     <div className="min-w-0">
                       <h4 className="text-sm font-black text-main truncate leading-tight uppercase">{user?.name || displayName}</h4>
