@@ -262,6 +262,7 @@ const Header = ({ searchQuery = "", onSearchChange }) => {
               className="flex items-center space-x-2 sm:space-x-3 p-1 sm:pr-3 rounded-2xl hover:bg-canvas-alt transition-all border border-transparent hover:border-border group"
               aria-expanded={dropdownOpen}
               aria-haspopup="true"
+              aria-label={user?.name ? `Profile menu for ${user.name}` : "Profile menu"}
             >
               <div className="relative">
                 <img

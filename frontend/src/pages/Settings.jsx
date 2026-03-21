@@ -1,5 +1,5 @@
 // frontend/src/pages/Settings.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -35,7 +35,7 @@ export default function Settings() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeSetting, setActiveSetting] = useState("profile");
-  const { user, updateUser, fetchUserProfile  } = useAuth();
+  const { user, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -62,11 +62,21 @@ export default function Settings() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [profilepopup, setProfilePopup] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  // Optimize image preview and prevent memory leaks
+  const avatarPreviewUrl = useMemo(() => {
+    if (avatarFile) {
+      return URL.createObjectURL(avatarFile);
+    }
+    return null;
+  }, [avatarFile]);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewUrl) {
+        URL.revokeObjectURL(avatarPreviewUrl);
+      }
+    };
+  }, [avatarPreviewUrl]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -98,11 +108,19 @@ export default function Settings() {
       updateUser(response.data);
 
       setAvatarFile(null);
-      toast.success(t("settings.profile.update_success") || "Profile updated successfully!");
+      toast.success(
+        t("settings.profile.update_success", {
+          defaultValue: "Profile updated successfully!",
+        })
+      );
       setProfilePopup(true);
     } catch (error) {
       console.error("❌ Error updating profile:", error.response?.data || error);
-      toast.error(t("settings.profile.update_error") || "Failed to update profile.");
+      toast.error(
+        t("settings.profile.update_error", {
+          defaultValue: "Failed to update profile.",
+        })
+      );
     } finally {
       setLoading(false);
     }
@@ -210,9 +228,11 @@ export default function Settings() {
                         <div className="w-32 h-32 rounded-full border-4 border-[rgba(255,135,89,0.65)] shadow-lg overflow-hidden bg-canvas">
                           <img
                             src={
-                              avatarFile
-                                ? URL.createObjectURL(avatarFile)
-                                : user?.avatar_url || `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(formData.firstName + " " + formData.lastName)}`
+                              avatarPreviewUrl ||
+                              user?.avatar_url ||
+                              `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(
+                                formData.firstName + " " + formData.lastName
+                              )}`
                             }
                             alt="Profile"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
